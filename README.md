@@ -133,3 +133,16 @@ Several methods are exposed in the reactive.apt Python package.
     * `purge(packages)`
 
       Purge one or more deb packages from the system
+
+
+## Support
+
+This layer is maintained on Launchpad by
+Stuart Bishop (stuart.bishop@canonical.com).
+
+Code is available using git at git+ssh://git.launchpad.net/layer-apt.
+
+Bug reports can be made at https://bugs.launchpad.net/layer-apt.
+
+Queries and comments can be made on the Juju mailing list, Juju IRC
+channels, or at https://answers.launchpad.net/layer-apt.
