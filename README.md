@@ -11,67 +11,67 @@ their particular installations.
 The charm may provide defaults for these service configuration
 (config.yaml) options, and the operator may override them as required.
 
-    * `extra_packages`
+* `extra_packages`
 
-      A space separated list of additional deb packages to install on
-      each unit.
+  A space separated list of additional deb packages to install on
+  each unit.
 
-    * `package_status`
+* `package_status`
 
-      'install' or 'hold'. When set to hold, packages installed using
-      the Apt layer API will be pinned, so that they will not be
-      automatically upgraded when package updates are performed. 'hold'
-      is particularly useful for allowing a service such as Landscape
-      to automatically apply security updates to most of the system,
-      whilst holding back any potentially service affecting updates.
+  'install' or 'hold'. When set to hold, packages installed using
+  the Apt layer API will be pinned, so that they will not be
+  automatically upgraded when package updates are performed. 'hold'
+  is particularly useful for allowing a service such as Landscape
+  to automatically apply security updates to most of the system,
+  whilst holding back any potentially service affecting updates.
 
-    * `install_sources`
+* `install_sources`
 
-      A list of apt sources containing the packages that need to be installed.
-      Each source may be either a line that can be added directly to
-      sources.list(5), or in the form ppa:<user>/<ppa-name> for adding
-      Personal Package Archives, or a distribution component to enable.
-      The list is a yaml list, encoded as a string. The nicest way of
-      declaring this in a yaml file looks like the following (in particular,
-      the | character indicates that the value is a multiline string):
+  A list of apt sources containing the packages that need to be installed.
+  Each source may be either a line that can be added directly to
+  sources.list(5), or in the form ppa:<user>/<ppa-name> for adding
+  Personal Package Archives, or a distribution component to enable.
+  The list is a yaml list, encoded as a string. The nicest way of
+  declaring this in a yaml file looks like the following (in particular,
+  the | character indicates that the value is a multiline string):
 
-      ```
-        install_sources: |
-            - ppa:stub/cassandra
-            - deb http://www.apache.org/dist/cassandra/debian 21x main
-      ```
+  ```yaml
+  install_sources: |
+      - ppa:stub/cassandra
+      - deb http://www.apache.org/dist/cassandra/debian 21x main
+  ```
 
-    * `install_keys`
+* `install_keys`
 
-      A list of GPG signing keys to accept. There needs to be one entry
-      per entry in install_sources. null may be used if no keep is
-      needed, which is the case for PPAs and for the standard Ubuntu
-      archives. Keys should be full ASCII armoured GPG public keys.
-      GPG key ids are also accepted, but in most environments this
-      mechanism is not secure. The install_keys list, like
-      install_sources, must also be a yaml formatted list encoded as
-      a string:
+  A list of GPG signing keys to accept. There needs to be one entry
+  per entry in install_sources. null may be used if no keep is
+  needed, which is the case for PPAs and for the standard Ubuntu
+  archives. Keys should be full ASCII armoured GPG public keys.
+  GPG key ids are also accepted, but in most environments this
+  mechanism is not secure. The install_keys list, like
+  install_sources, must also be a yaml formatted list encoded as
+  a string:
 
-      ```
-        install_keys: |
-            - null
-            - |
-              -----BEGIN PGP PUBLIC KEY BLOCK-----
-              Version: GnuPG v1
+  ```yaml
+  install_keys: |
+      - null
+      - |
+          -----BEGIN PGP PUBLIC KEY BLOCK-----
+          Version: GnuPG v1
 
-              mQINBFQJvgUBEAC0KcYCTj0hd15p4fiXBsbob0sKgsvN5Lm7N9jzJWlGshJ0peMi
-              kH8YhDXw5Lh+mPEHksL7t1L8CIr1a+ntns/Opt65ZPO38ENVkOqEVAn9Z5sIoZsb
-              AUeLlJzSeRLTKhcOugK7UcsQD2FHnMBJz50bxis9X7pjmnc/tWpjAGJfaWdjDIo=
-              =yiQ4
-              -----END PGP PUBLIC KEY BLOCK-----
-      ```
+          mQINBFQJvgUBEAC0KcYCTj0hd15p4fiXBsbob0sKgsvN5Lm7N9jzJWlGshJ0peMi
+          kH8YhDXw5Lh+mPEHksL7t1L8CIr1a+ntns/Opt65ZPO38ENVkOqEVAn9Z5sIoZsb
+          AUeLlJzSeRLTKhcOugK7UcsQD2FHnMBJz50bxis9X7pjmnc/tWpjAGJfaWdjDIo=
+          =yiQ4
+          -----END PGP PUBLIC KEY BLOCK-----
+  ```
 
 ## Usage
 
 Queue packages for installation, and have handlers waiting for
 these packages to finish being installed:
 
-```
+```python
 from reactive import apt
 
 @hook('install')
@@ -93,46 +93,46 @@ def grabit():
 
 Several methods are exposed in the reactive.apt Python package.
 
-    * `add_source(source, key=None)`
+* `add_source(source, key=None)`
 
-      Add an apt source.
+  Add an apt source.
 
-      A source may be either a line that can be added directly to
-      sources.list(5), or in the form ppa:<user>/<ppa-name> for adding
-      Personal Package Archives, or a distribution component to enable.
-   
-      The package signing key should be an ASCII armoured GPG key. While
-      GPG key ids are also supported, the retrieval mechanism is insecure.
-      There is no need to specify the package signing key for PPAs or for
-      the main Ubuntu archives.
+  A source may be either a line that can be added directly to
+  sources.list(5), or in the form ppa:<user>/<ppa-name> for adding
+  Personal Package Archives, or a distribution component to enable.
 
-      It is preferable if charms do not call this directly to hard
-      coded apt sources, but instead have these sources listed
-      as defaults in the install_sources config option. This allows
-      operators to mirror your packages to internal archives and
-      deploy your charm in environments without network access.
+  The package signing key should be an ASCII armoured GPG key. While
+  GPG key ids are also supported, the retrieval mechanism is insecure.
+  There is no need to specify the package signing key for PPAs or for
+  the main Ubuntu archives.
 
-      Sets the `apt.needs_update` reactive state.
+  It is preferable if charms do not call this directly to hard
+  coded apt sources, but instead have these sources listed
+  as defaults in the install_sources config option. This allows
+  operators to mirror your packages to internal archives and
+  deploy your charm in environments without network access.
 
-    * `queue_install(packages, options=None)`
+  Sets the `apt.needs_update` reactive state.
 
-      Queue one or more deb packages for install. The actual package
-      installation will be performed later by a handler in the
-      apt layer. The `apt.installed.{name}` state will be set once
-      the package installed (one state for each package).
+* `queue_install(packages, options=None)`
 
-      If a package has already been installed it will not be reinstalled.
+  Queue one or more deb packages for install. The actual package
+  installation will be performed later by a handler in the
+  apt layer. The `apt.installed.{name}` state will be set once
+  the package installed (one state for each package).
 
-      If a package has already been queued it will not be requeued, and
-      the install options will not be changed.
+  If a package has already been installed it will not be reinstalled.
 
-    * `installed()`
+  If a package has already been queued it will not be requeued, and
+  the install options will not be changed.
 
-      Returns the set of deb packages installed by this layer.
+* `installed()`
 
-    * `purge(packages)`
+  Returns the set of deb packages installed by this layer.
 
-      Purge one or more deb packages from the system
+* `purge(packages)`
+
+  Purge one or more deb packages from the system
 
 
 ## Support
