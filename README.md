@@ -72,15 +72,15 @@ Queue packages for installation, and have handlers waiting for
 these packages to finish being installed:
 
 ```python
-from reactive import apt
+import charms.apt
 
 @hook('install')
 def install():
-    apt.queue_install(['git'])
+    charms.apt.queue_install(['git'])
 
 @when_not('apt.installed.gnupg')
 def install_gnupg():
-    apt.queue_install(['gnupg'])
+    charms.apt.queue_install(['gnupg'])
 
 @when('apt.installed.git')
 @when('apt.installed.gnupg')
@@ -91,7 +91,7 @@ def grabit():
 
 ### API
 
-Several methods are exposed in the reactive.apt Python package.
+Several methods are exposed in the charms.apt Python package.
 
 * `add_source(source, key=None)`
 
@@ -133,6 +133,25 @@ Several methods are exposed in the reactive.apt Python package.
 * `purge(packages)`
 
   Purge one or more deb packages from the system
+
+
+### Extras
+
+These methods are called automatically by the reactive framework as
+reactive state demands. However, you can also invoke them directly
+if you want the operation done right now.
+
+* `update()`
+
+  Update the apt cache. Removes the `apt.needs_update` state.
+
+
+* `install_queued()`
+
+  Installs deb packages queued for installation. Removes the
+  `apt.queued_installs` state. Sets the `apt.installed.{packagename}`
+  state for each installed package. On failure, sets the unit's workload
+  state to 'blocked' and the failed package installs remain queued.
 
 
 ## Support
