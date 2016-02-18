@@ -148,10 +148,11 @@ if you want the operation done right now.
 
 * `install_queued()`
 
-  Installs deb packages queued for installation. Removes the
-  `apt.queued_installs` state. Sets the `apt.installed.{packagename}`
-  state for each installed package. On failure, sets the unit's workload
-  state to 'blocked' and the failed package installs remain queued.
+  Installs deb packages queued for installation. On success, removes
+  the `apt.queued_installs` state, sets the `apt.installed.{packagename}`
+  state for each installed package, and returns True. On failure,
+  sets the unit workload status to blocked and returns False.
+  The package installs remain queued.
 
 
 ## Support
