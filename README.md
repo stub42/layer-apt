@@ -155,6 +155,33 @@ if you want the operation done right now.
   The package installs remain queued.
 
 
+### Layer Options
+
+Packages can be specified at charm-build time in `layer.yaml`. List the
+packages in the 'basic' or 'apt' sections.
+
+```yaml
+includes:
+  - layer:basic
+  - layer:apt
+options:
+  basic:
+    packages:
+      - python3-psycopg2
+  apt:
+    packages:
+      - git
+      - bzr
+```
+
+Packages required to import your Python reactive handlers should go
+under 'basic'. These get installed by the base layer very early during
+charm bootstrap, and only packages available in the main Ubuntu archive
+can go here. Other packages should go under 'apt'. These will be
+installed later, after custom apt sources such as PPAs have been added
+from the `install_sources` configuration option.
+
+
 ## Support
 
 This layer is maintained on Launchpad by
