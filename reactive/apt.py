@@ -23,6 +23,7 @@ once the apt.installed.{packagename} state is set.
 '''
 from charmhelpers import fetch
 from charmhelpers.core import hookenv
+from charms import layer
 from charms import reactive
 from charms.reactive import when, when_not
 
@@ -83,6 +84,18 @@ def configure_sources():
         queue_install(extra_packages)
 
 
+def queue_layer_packages():
+    """Add packages listed in build-time layer options."""
+    # Both basic and apt layer. basic layer will have already installed
+    # its defined packages, but rescheduling it here gets the apt layer
+    # state set and they will pinned as any other apt layer installed
+    # package.
+    opts = layer.options()
+    for section in ['basic', 'apt']:
+        if section in opts and 'packages' in opts[section]:
+            queue_install(opts[section]['packages'])
+
+
 # Per https://github.com/juju-solutions/charms.reactive/issues/33,
 # this module may be imported multiple times so ensure the
 # initialization hook is only registered once. I have to piggy back
@@ -95,4 +108,5 @@ if not hasattr(reactive, '_apt_registered'):
     # to running hooks well before the config-changed hook has been invoked
     # and the intialization provided an opertunity to be run.
     hookenv.atstart(configure_sources)
+    hookenv.atstart(queue_layer_packages)
     reactive._apt_registered = True
