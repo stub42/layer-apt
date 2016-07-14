@@ -29,12 +29,6 @@ from charms import reactive
 from charms.reactive import when, when_not
 
 import charms.apt
-# Aliases for backwards compatibility
-from charms.apt import add_source, queue_install, installed, purge
-
-
-__all__ = ['add_source', 'update', 'queue_install', 'install_queued',
-           'installed', 'purge', 'ensure_package_status']
 
 
 @when('apt.needs_update')
