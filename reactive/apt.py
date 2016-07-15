@@ -63,7 +63,6 @@ def configure_sources():
 
     See charmhelpers.fetch.configure_sources for details.
     """
-    hookenv.log('Initializing Apt Layer')
     config = hookenv.config()
 
     # We don't have enums, so we need to validate this ourselves.
@@ -113,6 +112,7 @@ if not hasattr(reactive, '_apt_registered'):
     # do this, then the config in the hook environment may show updates
     # to running hooks well before the config-changed hook has been invoked
     # and the intialization provided an opertunity to be run.
+    hookenv.atstart(hookenv.log, 'Initializing Apt Layer')
     hookenv.atstart(clear_removed_package_states)
     hookenv.atstart(configure_sources)
     hookenv.atstart(queue_layer_packages)
