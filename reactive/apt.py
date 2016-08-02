@@ -21,6 +21,8 @@ Add apt package sources using add_source(). Queue deb packages for
 installation with install(). Configure and work with your software
 once the apt.installed.{packagename} state is set.
 '''
+import subprocess
+
 from charmhelpers import fetch
 from charmhelpers.core import hookenv
 from charmhelpers.core.hookenv import WARNING
@@ -47,9 +49,19 @@ def ensure_package_status():
     charms.apt.ensure_package_status()
 
 
+def filter_installed_packages(packages):
+    # Don't use fetch.filter_installed_packages, as it depends on python-apt
+    # and not available if the basic layer's use_site_packages option is off
+    # TODO: Move this to charm-helpers.fetch
+    cmd = ['dpkg-query', '--show', r'--showformat=${Package}\n']
+    installed = set(subprocess.check_output(cmd,
+                                            universal_newlines=True).split())
+    return set(packages) - installed
+
+
 def clear_removed_package_states():
     """On hook startup, clear install states for removed packages."""
-    removed = fetch.filter_installed_packages(charms.apt.installed())
+    removed = filter_installed_packages(charms.apt.installed())
     if removed:
         hookenv.log('{} missing packages ({})'.format(len(removed),
                                                       ','.join(removed)),
