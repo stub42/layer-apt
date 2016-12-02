@@ -3,3 +3,11 @@ defines:
     type: array
     default: []
     description: Additional packages to be installed at time of bootstrap
+  version_package:
+    type: string
+    default: ''
+    description: Set application version from this apt package
+  full_version:
+    type: boolean
+    default: False
+    description: Use the full Debian version number from version_package

@@ -157,6 +157,8 @@ if you want the operation done right now.
 
 ### Layer Options
 
+#### Automatic package installation
+
 Packages can be specified at charm-build time in `layer.yaml`. List the
 packages in the 'basic' or 'apt' sections.
 
@@ -180,6 +182,29 @@ charm bootstrap, and only packages available in the main Ubuntu archive
 can go here. Other packages should go under 'apt'. These will be
 installed later, after custom apt sources such as PPAs have been added
 from the `install_sources` configuration option.
+
+
+#### Application version number
+
+The application version number may be automatically set by specifying
+a package name in `layer.yaml`.
+
+```yaml
+includes:
+  - layer:basic
+  - layer:apt
+options:
+  apt:
+    packages:
+      - apache2
+    version_package: apache2
+    full_version: False
+```
+
+The default for `full_version` is False, meaning the shorter 'upstream'
+version number will be used. Setting `full_version` to True will
+set the application version to the full Debian version number for the
+package.
 
 
 ## Support
