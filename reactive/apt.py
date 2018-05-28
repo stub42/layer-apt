@@ -21,11 +21,12 @@ Add apt package sources using add_source(). Queue deb packages for
 installation with install(). Configure and work with your software
 once the apt.installed.{packagename} state is set.
 '''
+import os.path
 import subprocess
 
 from charmhelpers import fetch
 from charmhelpers.core import hookenv
-from charmhelpers.core.hookenv import WARNING
+from charmhelpers.core.hookenv import DEBUG, ERROR, WARNING
 from charms import layer
 from charms import reactive
 from charms.reactive import when, when_not
@@ -67,6 +68,30 @@ def clear_removed_package_states():
                     WARNING)
         for package in removed:
             reactive.remove_state('apt.installed.{}'.format(package))
+
+
+def add_implicit_signing_keys():
+    """Add keys specified in layer.yaml
+
+    The charm can ship trusted keys, avoiding the need to specify
+    them in config.yaml. We need to add them before we attempt
+    to add any custom sources, or apt will block under Bionic
+    if we attempt to add a source before the key becomes trusted.
+    """
+    opts = layer.options()
+    if 'apt' not in opts or 'keys' not in opts['apt']:
+        return
+    keys = opts['apt']['keys']
+    for p in keys:
+        full_p = os.path.join(hookenv.charm_dir(), p)
+        if os.path.exists(full_p):
+            hookenv.log("Adding key {}".format(p), DEBUG)
+            subprocess.check_call(['apt-key', 'add', full_p],
+                                  stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL)
+        else:
+            hookenv.log('Key {!r} does not exist'.format(full_p), ERROR)
 
 
 def configure_sources():
@@ -126,6 +151,7 @@ if not hasattr(reactive, '_apt_registered'):
     # and the intialization provided an opertunity to be run.
     hookenv.atstart(hookenv.log, 'Initializing Apt Layer')
     hookenv.atstart(clear_removed_package_states)
+    hookenv.atstart(add_implicit_signing_keys)
     hookenv.atstart(configure_sources)
     hookenv.atstart(queue_layer_packages)
     hookenv.atstart(charms.apt.reset_application_version)
