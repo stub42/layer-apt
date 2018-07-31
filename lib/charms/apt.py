@@ -207,7 +207,7 @@ def status_set(state, message):
     '''
     if state is None:
         state = hookenv.status_get()[0]
-        if state == 'unknown':
+        if state not in ('active', 'waiting', 'blocked'):
             state = 'maintenance'  # Guess
     if state in ('error', 'blocked'):
         lvl = hookenv.WARNING
