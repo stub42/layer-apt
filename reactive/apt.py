@@ -28,6 +28,7 @@ from charmhelpers import fetch
 from charmhelpers.core import hookenv
 from charmhelpers.core.hookenv import DEBUG, ERROR, WARNING
 from charms import layer
+from charms.layer import status
 from charms import reactive
 from charms.reactive import when, when_not
 
@@ -102,9 +103,7 @@ def configure_sources():
     # We don't have enums, so we need to validate this ourselves.
     package_status = config.get('package_status') or ''
     if package_status not in ('hold', 'install'):
-        charms.apt.status_set('blocked',
-                              'Unknown package_status {}'
-                              ''.format(package_status))
+        status.blocked('Unknown package_status {}'.format(package_status))
         # Die before further hooks are run. This isn't very nice, but
         # there is no other way to inform the operator that they have
         # invalid configuration.

@@ -28,6 +28,7 @@ import subprocess
 from charmhelpers import fetch
 from charmhelpers.core import hookenv, unitdata
 from charms import layer, reactive
+from charms.layer import status
 from charms.reactive import flags
 
 
@@ -100,7 +101,7 @@ def update():
 
     Removes the apt.needs_update flag.
     """
-    status_set(None, 'Updating apt cache')
+    status.maintenance('Updating apt cache')
     fetch.apt_update(fatal=True)  # Friends don't let friends set fatal=False
     reactive.clear_flag('apt.needs_update')
 
@@ -125,14 +126,12 @@ def install_queued():
     for options, batch in itertools.groupby(queue, lambda x: x[0]):
         packages = [b[1] for b in batch]
         try:
-            status_set(None, 'Installing {}'.format(','.join(packages)))
+            status.maintenance('Installing {}'.format(','.join(packages)))
             fetch.apt_install(packages, options, fatal=True)
             store.unsetrange(packages, prefix='apt.install_queue.')
             installed.update(packages)
         except subprocess.CalledProcessError:
-            status_set('blocked',
-                       'Unable to install packages {}'
-                       .format(','.join(packages)))
+            status.blocked('Unable to install packages {}'.format(','.join(packages)))
             return False  # Without setting reactive flag.
 
     for package in installed:
@@ -201,7 +200,7 @@ def ensure_package_status():
 
 
 def status_set(state, message):
-    '''Set the unit's workload status.
+    '''DEPRECATED, set the unit's workload status.
 
     Set state == None to keep the same state and just change the message.
     '''
@@ -209,9 +208,4 @@ def status_set(state, message):
         state = hookenv.status_get()[0]
         if state not in ('active', 'waiting', 'blocked'):
             state = 'maintenance'  # Guess
-    if state in ('error', 'blocked'):
-        lvl = hookenv.WARNING
-    else:
-        lvl = hookenv.INFO
-    hookenv.status_set(state, message)
-    hookenv.log('{}: {}'.format(state, message), lvl)
+    status.status_set(state, message)

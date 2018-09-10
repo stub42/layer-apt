@@ -1,3 +1,6 @@
+includes:
+    - layer:basic
+    - layer:status
 defines:
     packages:
         type: array
