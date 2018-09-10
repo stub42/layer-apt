@@ -112,14 +112,14 @@ Several methods are exposed in the charms.apt Python package.
   operators to mirror your packages to internal archives and
   deploy your charm in environments without network access.
 
-  Sets the `apt.needs_update` reactive state.
+  Sets the `apt.needs_update` reactive flag.
 
 * `queue_install(packages, options=None)`
 
   Queue one or more deb packages for install. The actual package
   installation will be performed later by a handler in the
-  apt layer. The `apt.installed.{name}` state will be set once
-  the package installed (one state for each package).
+  apt layer. The `apt.installed.{name}` flag will be set once
+  the package installed (one flag for each package).
 
   If a package has already been installed it will not be reinstalled.
 
@@ -138,19 +138,19 @@ Several methods are exposed in the charms.apt Python package.
 ### Extras
 
 These methods are called automatically by the reactive framework as
-reactive state demands. However, you can also invoke them directly
+reactive flag demands. However, you can also invoke them directly
 if you want the operation done right now.
 
 * `update()`
 
-  Update the apt cache. Removes the `apt.needs_update` state.
+  Update the apt cache. Removes the `apt.needs_update` flag.
 
 
 * `install_queued()`
 
   Installs deb packages queued for installation. On success, removes
-  the `apt.queued_installs` state, sets the `apt.installed.{packagename}`
-  state for each installed package, and returns True. On failure,
+  the `apt.queued_installs` flag, sets the `apt.installed.{packagename}`
+  flag for each installed package, and returns True. On failure,
   sets the unit workload status to blocked and returns False.
   The package installs remain queued.
 
