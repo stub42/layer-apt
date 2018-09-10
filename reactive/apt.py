@@ -135,21 +135,9 @@ def queue_layer_packages():
             charms.apt.queue_install(opts[section]['packages'])
 
 
-# Per https://github.com/juju-solutions/charms.reactive/issues/33,
-# this module may be imported multiple times so ensure the
-# initialization hook is only registered once. I have to piggy back
-# onto the namespace of a module imported before reactive discovery
-# to do this.
-if not hasattr(reactive, '_apt_registered'):
-    # We need to register this to run every hook, not just during install
-    # and config-changed, to protect against race conditions. If we don't
-    # do this, then the config in the hook environment may show updates
-    # to running hooks well before the config-changed hook has been invoked
-    # and the intialization provided an opertunity to be run.
-    hookenv.atstart(hookenv.log, 'Initializing Apt Layer')
-    hookenv.atstart(clear_removed_package_flags)
-    hookenv.atstart(add_implicit_signing_keys)
-    hookenv.atstart(configure_sources)
-    hookenv.atstart(queue_layer_packages)
-    hookenv.atstart(charms.apt.reset_application_version)
-    reactive._apt_registered = True
+hookenv.atstart(hookenv.log, 'Initializing Apt Layer')
+hookenv.atstart(clear_removed_package_flags)
+hookenv.atstart(add_implicit_signing_keys)
+hookenv.atstart(configure_sources)
+hookenv.atstart(queue_layer_packages)
+hookenv.atstart(charms.apt.reset_application_version)
