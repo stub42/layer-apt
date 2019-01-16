@@ -54,7 +54,8 @@ The charm may provide defaults for these service configuration
   a string:
 
   ```yaml
-  install_keys: |
+  install_keys:
+      default: |
       - null
       - |
           -----BEGIN PGP PUBLIC KEY BLOCK-----
