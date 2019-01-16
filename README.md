@@ -36,7 +36,8 @@ The charm may provide defaults for these service configuration
   the | character indicates that the value is a multiline string):
 
   ```yaml
-  install_sources: |
+  install_sources:
+      default: |
       - ppa:stub/cassandra
       - deb http://www.apache.org/dist/cassandra/debian 21x main
   ```
