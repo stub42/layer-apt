@@ -156,7 +156,7 @@ def get_package_version(package, full_version=False):
     if not full_version:
         # Attempt to strip off Debian style metadata from the end of the
         # version number.
-        m = re.search('^([\d.a-z]+)', full, re.I)
+        m = re.search(r'^([\d.a-z]+)', full, re.I)
         if m is not None:
             return m.group(1)
     return full
