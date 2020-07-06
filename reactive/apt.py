@@ -23,6 +23,7 @@ once the apt.installed.{packagename} flag is set.
 '''
 import os.path
 import subprocess
+import re
 
 from charmhelpers import fetch
 from charmhelpers.core import hookenv
@@ -57,7 +58,22 @@ def filter_installed_packages(packages):
     cmd = ['dpkg-query', '--show', r'--showformat=${Package}\n']
     installed = set(subprocess.check_output(cmd,
                                             universal_newlines=True).split())
-    return set(packages) - installed
+
+    # list of packages that are not installed
+    not_installed = set(packages) - installed
+
+    # now we want to check for any regex in the installation of the packages
+    not_installed_iterable = not_installed.copy()
+    for pkg in not_installed_iterable:
+        # grab the pattern that we want to match against the packages
+        p = re.compile(pkg)
+        for pkg2 in installed:
+            matched = p.search(pkg2)
+            if matched:
+                not_installed.remove(pkg)
+                break
+
+    return not_installed
 
 
 def clear_removed_package_flags():
