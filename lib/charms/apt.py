@@ -1,4 +1,4 @@
-# Copyright 2015-2016 Canonical Ltd.
+# Copyright 2015-2020 Canonical Ltd.
 #
 # This file is part of the Apt layer for Juju.
 #
@@ -32,8 +32,7 @@ from charms.layer import status
 from charms.reactive import flags
 
 
-__all__ = ['add_source', 'update', 'queue_install', 'install_queued',
-           'installed', 'purge', 'ensure_package_status']
+__all__ = ['add_source', 'update', 'queue_install', 'install_queued', 'installed', 'purge', 'ensure_package_status']
 
 
 def add_source(source, key=None):
@@ -73,9 +72,11 @@ def queue_install(packages, options=None):
     # Filter installed packages.
     store = unitdata.kv()
     queued_packages = store.getrange('apt.install_queue.', strip=True)
-    packages = {package: options for package in packages
-                if not (package in queued_packages or
-                        reactive.is_flag_set('apt.installed.' + package))}
+    packages = {
+        package: options
+        for package in packages
+        if not (package in queued_packages or reactive.is_flag_set('apt.installed.' + package))
+    }
     if packages:
         unitdata.kv().update(packages, prefix='apt.install_queue.')
         reactive.set_flag('apt.queued_installs')
@@ -83,8 +84,7 @@ def queue_install(packages, options=None):
 
 def installed():
     '''Return the set of deb packages completed install'''
-    return set(flag.split('.', 2)[2] for flag in flags.get_flags()
-               if flag.startswith('apt.installed.'))
+    return set(flag.split('.', 2)[2] for flag in flags.get_flags() if flag.startswith('apt.installed.'))
 
 
 def purge(packages):
@@ -118,9 +118,7 @@ def install_queued():
     installed package and returns True.
     '''
     store = unitdata.kv()
-    queue = sorted((options, package)
-                   for package, options in store.getrange('apt.install_queue.',
-                                                          strip=True).items())
+    queue = sorted((options, package) for package, options in store.getrange('apt.install_queue.', strip=True).items())
 
     installed = set()
     for options, batch in itertools.groupby(queue, lambda x: x[0]):
